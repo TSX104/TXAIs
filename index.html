@@ -54,6 +54,21 @@
   if (typeof setupFirebaseAuth === 'function') {
     setupFirebaseAuth();
   }
+  // 1. استيراد مكتبات المصادقة
+  import { 
+    getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword // <-- تمت إضافة هاتين الدالتين
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window._fbSignIn = () => signInWithPopup(auth, provider);
+  window._fbSignOut = () => signOut(auth);
+  window._fbOnAuth = (callback) => onAuthStateChanged(auth, callback);
+  
+  window._fbEmailSignUp = (email, password) => createUserWithEmailAndPassword(auth, email, password);
+  window._fbEmailSignIn = (email, password) => signInWithEmailAndPassword(auth, email, password);
 </script>
 
 <style>
@@ -875,32 +890,44 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 ══════════════════════════════════════════════════════ -->
 <div id="loginOverlay">
   <div class="login-card">
-    <div class="login-logo">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"
-           viewBox="0 0 24 24" stroke="white" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-      </svg>
-    </div>
-    <div class="login-title">AI Studio</div>
-    <div class="login-sub">Your intelligent multi-model AI workspace</div>
-
-    <button class="btn-google" onclick="handleGoogleSignIn()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Continue with Google
-    </button>
-
-    <div class="login-divider">or</div>
-
-    <button class="btn-skip" onclick="skipLogin()">
-      Continue without signing in
-    </button>
+  <div class="login-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+    </svg>
   </div>
+  <div class="login-title">AI Studio</div>
+  <div class="login-sub">Your intelligent multi-model AI workspace</div>
+
+  <!--Email/Password-->
+  <div style="margin-bottom: 16px; text-align: left;">
+    <input type="email" id="loginEmail" class="form-input" placeholder="Email address" style="margin-bottom: 8px;" />
+    <input type="password" id="loginPassword" class="form-input" placeholder="Password" />
+  </div>
+
+  <!-- SignIn/SignUp -->
+  <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+    <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="handleEmailAuth(false)">Sign In</button>
+    <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="handleEmailAuth(true)">Sign Up</button>
+  </div>
+
+  <!--google-->
+  <div class="login-divider">or</div>
+  <button class="btn-google" onclick="handleGoogleSignIn()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  </button>
+
+  <div class="login-divider"></div>
+
+  <button class="btn-skip" onclick="skipLogin()">
+    Continue without signing in
+  </button>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -1313,7 +1340,37 @@ async function handleGoogleSignIn() {
     showToast('Sign-in failed: ' + msg, 'error');
   }
 }
+async function handleEmailAuth(isSignUp) {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
 
+  if (!email || !password) {
+    showToast('Please enter both email and password', 'error');
+    return;
+  }
+
+  try {
+    if (isSignUp) {
+      // إنشاء حساب جديد
+      await window._fbEmailSignUp(email, password);
+      showToast('Account created successfully!', 'success');
+    } else {
+      // تسجيل الدخول بحساب موجود
+      await window._fbEmailSignIn(email, password);
+      showToast('Signed in successfully!', 'success');
+    }
+    enterApp(); // الدخول للتطبيق
+  } catch (e) {
+    // معالجة الأخطاء الشائعة وتحويلها لرسائل مفهومة
+    let msg = e.message;
+    if (e.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') msg = 'Incorrect email or password.';
+    if (e.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
+    if (e.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+    
+    showToast(msg, 'error');
+  }
+}
 function skipLogin() {
   enterApp();
 }
