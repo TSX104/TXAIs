@@ -884,90 +884,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   padding: 10px 14px;
 }
 
-/*Phone Editing*/
-
-@media (max-width: 768px) {
-  :root {
-    --sidebar-w: 85%; /* الشريط الجانبي يأخذ معظم الشاشة في الموبايل */
-    --header-h: 60px;
-  }
-
-  /* جعل الشريط الجانبي يطفو فوق المحتوى */
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 1000;
-    transform: translateX(-100%); /* مخفي افتراضياً */
-    transition: transform 0.3s var(--ease);
-    box-shadow: 20px 0 50px rgba(0,0,0,0.5);
-  }
-
-  .sidebar.open {
-    transform: translateX(0); /* إظهار عند التفعيل */
-  }
-
-  /* إظهار زر القائمة في الهيدر دائماً على الموبايل */
-  #sidebarOpenBtn {
-    display: flex !important;
-  }
-
-  /* تحسين منطقة الرسائل */
-  .message-group {
-    padding: 8px 12px;
-  }
-
-  .msg-content.user-msg {
-    max-width: 90%;
-  }
-
-  /* تحسين منطقة الإدخال */
-  .input-area {
-    padding: 10px 12px env(safe-area-inset-bottom); /* دعم حواف آيفون الحديثة */
-  }
-
-  .input-box {
-    border-radius: 24px;
-    padding: 8px 10px;
-  }
-
-  .input-shortcuts {
-    display: none; /* إخفاء اختصارات الكيبورد على الموبايل */
-  }
-
-  /* جعل المودال (الإعدادات) يأخذ كامل الشاشة تقريباً */
-  .modal-panel {
-    width: 95%;
-    max-height: 90vh;
-    margin: 10px;
-  }
-
-  .settings-tabs {
-    overflow-x: auto; /* السماح بالتمرير الأفقي للتبويبات */
-    white-space: nowrap;
-  }
-
-  /* تكبير أزرار اللمس */
-  .btn, .btn-icon, .input-btn, .btn-send {
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  /* خلفية مظلمة عند فتح القائمة الجانبية */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(2px);
-    z-index: 999;
-  }
-  
-  .sidebar.open + .sidebar-overlay {
-    display: block;
-  }
-}
 </style>
 </head>
 <body>
@@ -1714,17 +1630,11 @@ function loadConv(id) {
   activeConvId = id;
   const conv = conversations.find(c => c.id === id);
   if (!conv) return;
-  
   clearMessages(false);
   document.getElementById('welcomeScreen').classList.add('hidden');
   conv.messages.forEach(msg => renderMessage(msg.role, msg.content, msg.model_name, msg.files));
   renderConvList();
   scrollToBottom();
-
-  // إغلاق القائمة تلقائياً على الموبايل بعد اختيار المحادثة
-  if (window.innerWidth <= 768) {
-    toggleSidebar();
-  }
 }
 
 function deleteConv(id, e) {
@@ -2101,17 +2011,10 @@ function removeStagedFile(i) {
 /* ─── UI HELPERS ─────────────────────────────────────────────────────────── */
 function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
-  const sidebar = document.getElementById('sidebar');
-  
-  if (window.innerWidth <= 768) {
-    sidebar.classList.toggle('open', sidebarOpen);
-    // منع التمرير في الخلفية عند فتح القائمة
-    document.body.style.overflow = sidebarOpen ? 'hidden' : '';
-  } else {
-    sidebar.classList.toggle('collapsed', !sidebarOpen);
-  }
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
   lucide.createIcons(); 
 }
+
 function toggleSystemPrompt() {
   sysPromptOpen = !sysPromptOpen;
   document.getElementById('sysPromptBar').classList.toggle('open', sysPromptOpen);
@@ -2226,12 +2129,6 @@ function openLightbox(src) {
   document.getElementById('lightbox').classList.remove('hidden');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); }
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 768) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-});
 </script>
 </body>
 </html>
