@@ -17,15 +17,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-<!-- Firebase --><!-- Firebase -->
+<!-- Firebase --><!-- Firebase --><!-- Firebase -->
 <script type="module">
-  // استخدام روابط CDN مباشرة لضمان عملها بدون أدوات تجميع (Webpack/Vite)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js";
   
-  // 1. استيراد مكتبات المصادقة الخاصة بـ Google
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  // استيراد كل دوال المصادقة المطلوبة
+  import { 
+    getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword 
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBp1e8cEipsJsGSVB8zay8CskQ__tHRS9Y",
@@ -37,40 +38,24 @@
     measurementId: "G-6RS9KZKFXS"
   };
   
-  // 2. تهيئة Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-  
-  // 3. تهيئة المصادقة
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // 4. ربط دوال Firebase بالـ Window ليتعرف عليها باقي كود الصفحة
+  // ربط الدوال بالـ window
   window._fbSignIn = () => signInWithPopup(auth, provider);
   window._fbSignOut = () => signOut(auth);
   window._fbOnAuth = (callback) => onAuthStateChanged(auth, callback);
+  
+  // دوال الإيميل والباسورد الجديدة
+  window._fbEmailSignUp = (email, password) => createUserWithEmailAndPassword(auth, email, password);
+  window._fbEmailSignIn = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
-  // تحديث واجهة المستخدم فوراً إذا تم تحميل الصفحة
   if (typeof setupFirebaseAuth === 'function') {
     setupFirebaseAuth();
   }
-  // 1. استيراد مكتبات المصادقة
-  import { 
-    getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
-    createUserWithEmailAndPassword, signInWithEmailAndPassword // <-- تمت إضافة هاتين الدالتين
-  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  window._fbSignIn = () => signInWithPopup(auth, provider);
-  window._fbSignOut = () => signOut(auth);
-  window._fbOnAuth = (callback) => onAuthStateChanged(auth, callback);
-  
-  window._fbEmailSignUp = (email, password) => createUserWithEmailAndPassword(auth, email, password);
-  window._fbEmailSignIn = (email, password) => signInWithEmailAndPassword(auth, email, password);
 </script>
-
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN SYSTEM – Obsidian Precision
