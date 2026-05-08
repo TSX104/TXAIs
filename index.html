@@ -866,6 +866,23 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-top-color: var(--accent); border-radius: 50%;
   animation: spin .6s linear infinite;
 }
+
+#sidebarOpenBtn {
+  display: none;
+}
+
+/* عندما يكون الشريط الجانبي مغلقاً، أظهر زر الفتح في الهيدر */
+.sidebar.collapsed + .main #sidebarOpenBtn {
+  display: flex !important;
+}
+
+/* تحسين شكل رأس الشريط الجانبي ليحتوي الزر بشكل متناسق */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
 </style>
 </head>
 <body>
@@ -922,7 +939,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
   <!-- ── SIDEBAR ─────────────────────────────────────── -->
   <aside class="sidebar" id="sidebar">
-
     <div class="sidebar-header">
       <div class="logo-mark">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -932,6 +948,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </svg>
       </div>
       <span class="logo-text">AI Studio</span>
+
+      <div style="flex: 1;"></div> <!-- مساحة فارغة لدفع الزر لليمين -->
+    <button class="btn-icon" onclick="toggleSidebar()" title="Close sidebar">
+      <i data-lucide="panel-left-close" style="width:18px;height:18px"></i>
+    </button>
+
     </div>
 
     <div class="sidebar-actions">
@@ -977,9 +999,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- header -->
     <header class="chat-header">
-      <button class="btn-icon" onclick="toggleSidebar()" title="Toggle sidebar">
-        <i data-lucide="panel-left" style="width:18px;height:18px"></i>
-      </button>
+    <button class="btn-icon" id="sidebarOpenBtn" onclick="toggleSidebar()" title="Open sidebar" style="display: none;">
+    <i data-lucide="panel-left-open" style="width:18px;height:18px"></i>
+    </button>
 
       <!-- model selector -->
       <div class="model-selector" id="modelSelectorBtn" onclick="toggleModelDropdown()">
@@ -1989,6 +2011,7 @@ function removeStagedFile(i) {
 function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
   document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+  lucide.createIcons(); 
 }
 
 function toggleSystemPrompt() {
